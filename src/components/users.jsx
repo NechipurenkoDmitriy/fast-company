@@ -1,22 +1,19 @@
 import React, { useState } from 'react';
 import api from '../api';
 import { getNoun } from '../utils/getNoun';
+import { usersHeaderRow } from '../constants/table';
 
 const Users = () => {
   // console.log(api.users.fetchAll());
   const [users, setUsers] = useState(api.users.fetchAll());
   const usersNumber = Object.keys(users).length;
-  const usersThead = [
-    { key: 'name', text: 'Имя' },
-    { key: 'qualities', text: 'Качества' },
-    { key: 'profession', text: 'Профессия' },
-    { key: 'completedMeetings', text: 'Встретился, раз' },
-    { key: 'rate', text: 'Оценка' },
-    { key: 'deleteKey', text: '' },
-  ];
 
-  console.log(users);
-  //const handleDelete = (userId) => {};
+  //console.log(users);
+
+  const handleDelete = (userId) => {
+    // console.log(userId);
+    setUsers(users.filter((user) => user._id !== userId));
+  };
 
   const renderPhrase = (number) => {
     const oneMan = 'человек тусанёт';
@@ -26,72 +23,62 @@ const Users = () => {
 
     const phrase =
       number !== 0
-        ? number +
-          ' ' +
-          getNoun(number, oneMan, twoMen, fiveMen) +
-          ' ' +
-          withYou
+        ? `${number} ${getNoun(number, oneMan, twoMen, fiveMen)} ${withYou}`
         : `Никто не тусанет ${withYou}`;
 
     return phrase;
   };
 
-  const renderQualities = (user) => {
-    return user.qualities.map((quality) => (
-      <div key={quality._id} className={`badge bg-${quality.color} m-1`}>
-        {quality.name}
-      </div>
-    ));
-  };
+  const renderUsersTable = () => {
+    const usersThead = usersHeaderRow;
 
-  const renderTheadRow = () => {
-    return usersThead.map((column) => (
-      <th scope="col" key={column.text + Date.now()}>
-        {column.text}
-      </th>
-    ));
-  };
-
-  const renderUserRow = (user) => {
-    return usersThead.map((column) => {
-      if (column.key === 'deleteKey') {
-        return (
-          <td key={column.key}>
-            <button className="badge bg-danger">Delete</button>
-          </td>
-        );
-      }
-      if (column.key === 'profession') {
-        return (
-          <th scope="col" key={user[column.key].name}>
-            {user[column.key].name}
-          </th>
-        );
-      }
-      if (column.key === 'qualities') {
-        return (
-          <th scope="col" key={column.key}>
-            {renderQualities(user)}
-          </th>
-        );
-      }
-
+    const renderTh = (innerHTML, uniqueKey = innerHTML) => {
       return (
-        <th scope="col" key={user[column.key]}>
-          {user[column.key]}
+        <th scope="col" key={uniqueKey}>
+          {innerHTML}
         </th>
       );
-    });
-  };
+    };
 
-  return (
-    <div>
-      <span
-        className={`m-2 badge bg-${usersNumber !== 0 ? 'primary' : 'danger'}`}
-      >
-        {renderPhrase(usersNumber)}
-      </span>
+    const renderQualities = (user) => {
+      return user.qualities.map((quality) => (
+        <div key={quality._id} className={`badge bg-${quality.color} m-1`}>
+          {quality.name}
+        </div>
+      ));
+    };
 
+    const renderTheadRow = () => {
+      return usersThead.map((column) => renderTh(column.text));
+    };
+
+    const renderUserRow = (user) => {
+      return usersThead.map((column) => {
+        const defKey = column.key;
+        switch (defKey) {
+          case 'profession':
+            return renderTh(user[defKey].name);
+          case 'qualities':
+            return renderTh(renderQualities(user), defKey);
+          case 'rate':
+            return renderTh(`${user[defKey]}/5`, defKey);
+          case 'deleteKey':
+            return renderTh(
+              <button
+                className="btn btn-danger btn-sm"
+                onClick={() => handleDelete(user._id)}
+              >
+                Delete
+              </button>,
+              defKey
+            );
+          default:
+            return renderTh(user[defKey], defKey);
+        }
+      });
+    };
+
+    return (
       <table className="table">
         <thead>
           <tr>{renderTheadRow()}</tr>
@@ -103,6 +90,17 @@ const Users = () => {
           ))}
         </tbody>
       </table>
+    );
+  };
+
+  return (
+    <div>
+      <span
+        className={`m-2 badge bg-${usersNumber !== 0 ? 'primary' : 'danger'}`}
+      >
+        {renderPhrase(usersNumber)}
+      </span>
+      {renderUsersTable(users)}
     </div>
   );
 };
