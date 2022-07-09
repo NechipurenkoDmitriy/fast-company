@@ -1,17 +1,13 @@
 import React, { useState } from 'react';
 import api from '../api';
 import { getNoun } from '../utils/getNoun';
-import { usersHeaderRow } from '../constants/table';
+import { USERS_HEADER_ROWS } from '../constants/table';
 
 const Users = () => {
-  // console.log(api.users.fetchAll());
   const [users, setUsers] = useState(api.users.fetchAll());
-  const usersNumber = Object.keys(users).length;
-
-  //console.log(users);
+  const usersNumber = users.length; // это обычный массив
 
   const handleDelete = (userId) => {
-    // console.log(userId);
     setUsers(users.filter((user) => user._id !== userId));
   };
 
@@ -29,6 +25,9 @@ const Users = () => {
     return phrase;
   };
 
+  // что-то намудрил ты сильно, можем вместе обсудить 
+  // просто рендери строки и все 
+  
   const renderUsersTable = () => {
     const usersThead = usersHeaderRow;
 
