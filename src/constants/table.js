@@ -1,4 +1,4 @@
-export const usersHeaderRow = [
+export const USERS_HEADER_ROW = [ // так принято писать контсанты
   { key: 'name', text: 'Имя' },
   { key: 'qualities', text: 'Качества' },
   { key: 'profession', text: 'Профессия' },
