@@ -1,17 +1,13 @@
 import React, { useState } from 'react';
 import api from '../api';
 import { getNoun } from '../utils/getNoun';
-import { usersHeaderRow } from '../constants/table';
 
 const Users = () => {
-  // console.log(api.users.fetchAll());
   const [users, setUsers] = useState(api.users.fetchAll());
   const usersNumber = Object.keys(users).length;
-
   //console.log(users);
 
   const handleDelete = (userId) => {
-    // console.log(userId);
     setUsers(users.filter((user) => user._id !== userId));
   };
 
@@ -24,15 +20,13 @@ const Users = () => {
     const phrase =
       number !== 0
         ? `${number} ${getNoun(number, oneMan, twoMen, fiveMen)} ${withYou}`
-        : `Никто не тусанет ${withYou}`;
+        : `Никто ${withYou} не тусанет`;
 
     return phrase;
   };
 
   const renderUsersTable = () => {
-    const usersThead = usersHeaderRow;
-
-    const renderTh = (innerHTML, uniqueKey = innerHTML) => {
+    const renderCell = (innerHTML, uniqueKey = innerHTML) => {
       return (
         <th scope="col" key={uniqueKey}>
           {innerHTML}
@@ -48,45 +42,36 @@ const Users = () => {
       ));
     };
 
-    const renderTheadRow = () => {
-      return usersThead.map((column) => renderTh(column.text));
-    };
-
-    const renderUserRow = (user) => {
-      return usersThead.map((column) => {
-        const defKey = column.key;
-        switch (defKey) {
-          case 'profession':
-            return renderTh(user[defKey].name);
-          case 'qualities':
-            return renderTh(renderQualities(user), defKey);
-          case 'rate':
-            return renderTh(`${user[defKey]}/5`, defKey);
-          case 'deleteKey':
-            return renderTh(
-              <button
-                className="btn btn-danger btn-sm"
-                onClick={() => handleDelete(user._id)}
-              >
-                Delete
-              </button>,
-              defKey
-            );
-          default:
-            return renderTh(user[defKey], defKey);
-        }
-      });
-    };
-
     return (
       <table className="table">
         <thead>
-          <tr>{renderTheadRow()}</tr>
+          <tr>
+            <th scope="col">Имя</th>
+            <th scope="col">Качества</th>
+            <th scope="col">Профессия</th>
+            <th scope="col">Встретился, раз</th>
+            <th scope="col">Оценка</th>
+            <th scope="col"></th>
+          </tr>
         </thead>
-
         <tbody>
           {users.map((user) => (
-            <tr key={user._id}>{renderUserRow(user)}</tr>
+            <tr key={user._id}>
+              {renderCell(user.name, 'name')}
+              {renderCell(renderQualities(user), 'qualities')}
+              {renderCell(user.profession.name, 'profession')}
+              {renderCell(user.completedMeetings, 'completedMeetings')}
+              {renderCell(`${user.rate}/5`, 'rate')}
+              {renderCell(
+                <button
+                  className="btn btn-danger btn-sm"
+                  onClick={() => handleDelete(user._id)}
+                >
+                  Delete
+                </button>,
+                'deleteButton'
+              )}
+            </tr>
           ))}
         </tbody>
       </table>

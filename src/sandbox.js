@@ -54,3 +54,5 @@
 //     // ${innerHTML}
 //     // </${blockName}>`;
 //   };
+//   const thAtributes = `scope="col" key=${uniqueKey}`;
+//   return renderHTMLElement('th', innerHTML, thAtributes);
