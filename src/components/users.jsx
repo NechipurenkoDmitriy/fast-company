@@ -26,7 +26,7 @@ const Users = () => {
   };
 
   const renderUsersTable = () => {
-    const renderCell = (innerHTML) => {
+    const renderCell = (innerHTML) => { // ну необязательно 
       return <th scope="col">{innerHTML}</th>;
     };
 
