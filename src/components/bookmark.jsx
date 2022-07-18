@@ -10,7 +10,7 @@ const BookMark = ({ status, ...rest }) => {
       className={`btn btn-sm btn-${!status ? 'secondary' : 'success'}`}
       onClick={() => rest.onToggleBookmark(rest.userId)}
     >
-      {!status ? OFF_ICON() : ON_ICON()}
+      {!status ? OFF_ICON : ON_ICON}
     </button>
   );
 };
