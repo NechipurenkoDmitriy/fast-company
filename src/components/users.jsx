@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from "react";
-import User from "./user";
+import _ from "lodash";
+import api from "../api";
 import { renderCell } from "../utils/renderCell";
 import Pagination from "./pagination";
 import { paginate } from "../utils/paginate";
 import PropTypes from "prop-types";
-import GroupList from "./groupList";
+import User from "./user";
 import SearchStatus from "./searchStatus";
-import api from "../api";
+import GroupList from "./groupList";
 
 const Users = ({ users, ...rest }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [professions, setProfession] = useState();
     const [selectedProf, setSelectedProf] = useState();
-
     const pageSize = 2;
     useEffect(() => {
         api.professions.fetchAll().then((data) => setProfession(data));
@@ -20,25 +20,28 @@ const Users = ({ users, ...rest }) => {
     useEffect(() => {
         setCurrentPage(1);
     }, [selectedProf]);
+
     const handleProfessionSelect = (item) => {
         setSelectedProf(item);
-        // console.log(params);///
     };
-
     const handlePageChange = (pageIndex) => {
         setCurrentPage(pageIndex);
     };
 
+    const usersValues = Object.values(users);
+
     const filteredUsers = selectedProf
-        ? users.filter((user) => user.profession === selectedProf)
-        : users;
+        ? usersValues.filter((user) => _.isEqual(user.profession, selectedProf))
+        : usersValues;
     const count = filteredUsers.length;
 
     const userCrop = paginate(filteredUsers, currentPage, pageSize);
     if (userCrop.length === 0 && currentPage !== 1) {
+        // pagination bad fix
         // ? нужна доппроверка?
         setCurrentPage(currentPage - 1);
     }
+
     const clearFilter = () => {
         setSelectedProf();
     };
@@ -78,11 +81,7 @@ const Users = ({ users, ...rest }) => {
                         </thead>
                         <tbody>
                             {userCrop.map((user) => (
-                                <User
-                                    key={user._id}
-                                    {...user}
-                                    {...rest} // onDelete={rest.onDelete}// onToggleBookmark={rest.onToggleBookmark}
-                                />
+                                <User key={user._id} {...user} {...rest} />
                             ))}
                         </tbody>
                     </table>
@@ -101,7 +100,7 @@ const Users = ({ users, ...rest }) => {
     );
 };
 Users.propTypes = {
-    users: PropTypes.array.isRequired
+    users: PropTypes.oneOfType([PropTypes.object, PropTypes.array])
 };
 
 export default Users;
