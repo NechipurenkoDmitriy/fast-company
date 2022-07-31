@@ -12,11 +12,11 @@ const SearchStatus = ({ length }) => {
         const phrase =
             number !== 0
                 ? `${number} ${getNoun(
-                      number,
-                      oneMan,
-                      twoMen,
-                      fiveMen
-                  )} ${withYou}`
+                    number,
+                    oneMan,
+                    twoMen,
+                    fiveMen
+                )} ${withYou}`
                 : `Никто ${withYou} не тусанет`;
 
         return phrase;
